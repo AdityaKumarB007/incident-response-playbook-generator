@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DefendX SIEM Dashboard</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i> DefendX SIEM
+        </div>
+        <ul class="nav">
+            <li class="active" onclick="showSection('dashboard', this)"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
+            <li onclick="showSection('incidents', this)"><i class="fa-solid fa-triangle-exclamation"></i> Incidents</li>
+            <li onclick="showSection('reports', this)"><i class="fa-solid fa-file-export"></i> Reports</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Security Operations Center (SOC)</h1>
+            <div class="user-info">
+                <div class="status-indicator"></div> Live Monitoring Active
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-bug"></i></div>
+                    <div class="stat-details">
+                        <h3>Total Attacks</h3>
+                        <p id="total-attacks">0</p>
+                    </div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+                    <div class="stat-details">
+                        <h3>Critical Incidents</h3>
+                        <p id="critical-attacks">0</p>
+                    </div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div class="stat-details">
+                        <h3>Targeted Endpoints</h3>
+                        <p id="unique-endpoints">0</p>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon"><i class="fa-solid fa-server"></i></div>
+                    <div class="stat-details">
+                        <h3>Source IPs</h3>
+                        <p id="unique-ips">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>Attack Distribution</h3>
+                    <canvas id="attackTypeChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Incident Severity</h3>
+                    <canvas id="severityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="recent-incidents card">
+                <h3>Critical & High Priority Incidents</h3>
+                <div class="table-responsive">
+                    <table id="recent-incidents-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Attack Type</th>
+                                <th>Source IP</th>
+                                <th>Severity</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidents-table-body">
+                            <!-- Items will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Incidents Section -->
+        <section id="incidents" class="content-section" style="display: none;">
+            <div class="card full-height">
+                <h3>All Monitored Incidents</h3>
+                <div class="table-responsive">
+                    <table class="full-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Timestamp</th>
+                                <th>Type</th>
+                                <th>Origin IP</th>
+                                <th>Target Endpoint</th>
+                                <th>Severity</th>
+                                <th>Options</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-incidents-body">
+                            <!-- Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Reports Section -->
+        <section id="reports" class="content-section" style="display: none;">
+            <div class="card export-card" style="margin-bottom: 24px;">
+                <h3>Export SOC Reports</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">Download comprehensive logs and security analyses.</p>
+                <div class="export-actions">
+                    <button class="btn btn-primary" onclick="window.open('/api/export/csv', '_blank')"><i class="fa-solid fa-file-csv"></i> Download CSV Event Log</button>
+                    <button class="btn btn-secondary" onclick="window.open('/api/export/json', '_blank')"><i class="fa-solid fa-file-code"></i> Download JSON Log</button>
+                </div>
+            </div>
+
+            <!-- New Templates Section -->
+            <div class="card full-height" id="templates-section">
+                <h3><i class="fa-solid fa-book-journal-whills"></i> Mitigation Templates Library</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                    Historical repository of detected attacks and the full incident response story from detection to completion. Data retrieved directly from MongoDB.
+                </p>
+                
+                <div id="templates-container" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Injected dynamically via JS: 
+                         - Attack Type Occurred/Detected
+                         - Story of IR
+                         - Steps Involved from detection to completion
+                    -->
+                    <div style="padding: 24px; text-align: center; color: var(--text-secondary); background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i> Loading historical templates from MongoDB...
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Playbook Modal -->
+    <div id="playbook-modal" class="modal">
+        <div class="modal-content" id="playbook-content-wrapper">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="printable-playbook">
+                <div class="playbook-header" style="flex-wrap: wrap;">
+                    <h2 style="width: 100%; display: flex; justify-content: space-between;; margin-bottom: 12px;">
+                        <span><i class="fa-solid fa-shield-virus"></i> Attack Prevention Report</span>
+                        <span id="pb-severity" class="badge"></span>
+                    </h2>
+                    <div id="pb-sla-banner" style="display: none; width: 100%; padding: 12px; border-radius: 6px; font-weight: 600; font-size: 14px; align-items: center; gap: 8px; margin-bottom: 15px;">
+                        <!-- Injected dynamically in JS -->
+                    </div>
+                </div>
+                <div class="playbook-meta">
+                    <p><strong>Incident ID:</strong> <span id="pb-id"></span></p>
+                    <p><strong>Attack Type:</strong> <span id="pb-type"></span></p>
+                    <p><strong>Source IP:</strong> <span id="pb-ip"></span></p>
+                    <p><strong>Evidence:</strong> <code id="pb-evidence"></code></p>
+                </div>
+                
+                <h3>Proactive Prevention Strategies</h3>
+                <div id="pb-steps" class="checklist">
+                    <!-- Steps injected here -->
+                </div>
+
+                <!-- Active Mitigation Framework -->
+                <div id="pb-mitigation-actions" style="margin-top: 32px; padding: 20px; background: rgba(0,0,0,0.2); border-left: 4px solid var(--danger); border-radius: 6px;">
+                    <h3 style="margin-bottom: 16px; color: var(--danger); font-size: 16px;"><i class="fa-solid fa-shield-virus"></i> Active Defenses</h3>
+                    <button id="btn-mitigate" class="btn btn-primary" style="background-color: var(--danger); border: 1px solid #7f1d1d;" onclick="mitigateAttack()">
+                        <i class="fa-solid fa-ban"></i> Implement WAF Rule: Block IP (<span id="pb-mitigate-ip"></span>)
+                    </button>
+                    <p id="mitigation-status" style="margin-top: 12px; font-weight: 500; font-size: 14px; display: none;"></p>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="exportPlaybookPDF()"><i class="fa-solid fa-file-pdf"></i> Export as PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

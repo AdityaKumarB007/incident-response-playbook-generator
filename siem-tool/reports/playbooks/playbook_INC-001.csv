@@ -1,0 +1,16 @@
+Field,Value
+incident_id,INC-001
+attack_type,SQL Injection
+source_ip,192.168.1.5
+endpoint,/login
+timestamp,2026-03-12 18:30
+severity,High
+
+Checklist,Status
+Identify the vulnerable endpoint,Pending
+Check database query logs,Pending
+Block attacker IP address,Pending
+Use parameterized queries,Pending
+Implement input validation,Pending
+Deploy Web Application Firewall rule,Pending
+Monitor for repeated attacks,Pending
